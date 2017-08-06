@@ -1,5 +1,7 @@
 export default class Client {
-    static config = window.__INITIAL_STATE__.config;
+    static fetch(url, options = null) {
+        return Client.makeCancelable(fetch(url, options))
+    }
 
     static makeCancelable = (promise) => {
         let hasCanceled_ = false;
@@ -7,12 +9,11 @@ export default class Client {
         const wrappedPromise = new Promise((resolve, reject) => {
             promise.then((val) => hasCanceled_ ? reject({
                 isCanceled: true
-            }) : resolve(val)
-            );
+            }) : resolve(val));
+
             promise.catch((error) => hasCanceled_ ? reject({
                 isCanceled: true
-            }) : reject(error)
-            );
+            }) : reject(error));
         });
 
         return {
