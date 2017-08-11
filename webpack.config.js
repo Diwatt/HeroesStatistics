@@ -25,6 +25,7 @@ module.exports.default = {
         }]
     },
 
+    devtool: "eval",
 
     /**
      * Determine the array of extensions that should be used to resolve modules.

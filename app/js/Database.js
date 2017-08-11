@@ -4,19 +4,24 @@ import Config from "./Config";
 class DatabaseConnector
 {
     constructor(dbname = 'HeroesStatistics', version = 1) {
-        this.idb = new Dexie(dbname);
+        this.db = new Dexie(dbname);
         this.defineTables(version);
+        this.open();
     }
 
     defineTables(version = 1) {
-        this.idb.version(version).stores({
-            users: '++id,hotlogsUserId,battleTag',
+        this.db.version(version).stores({
+            users: '++id,hotlogsUserId,battleTag,isActive',
             games: '++id,userId,hotlogsReplayId,heroRole,mapName,duration,heroName,heroLevel,isWon,mmr,mmrDelta,date'
         });
     }
+
+    open() {
+        this.db.open().catch(() => {
+            alert('no db...');
+        })
+    }
 }
 
-let connector = new DatabaseConnector(Config.db.name, Config.db.version);
-
-export default connector.idb;
+export default (new DatabaseConnector(Config.db.name, Config.db.version)).db;
 

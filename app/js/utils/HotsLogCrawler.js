@@ -4,21 +4,21 @@ import moment from "moment";
 export default class HotsLogCrawler {
     gamesUrl = 'https://www.hotslogs.com/Player/MatchHistory?PlayerID=';
     keys = [
-        {key: 'hero_role'},
-        {key: 'replay_id', format: '_parseInt'},
-        {key: 'map_name'},
-        {key: 'game_duration'},
-        {key: 'hero_name'},
         null,
-        {key: 'level', format: '_parseInt'},
-        {key: 'is_won', format: '_parseBool'},
+        {key: 'replayId', format: '_parseInt'},
+        {key: 'mapName'},
+        {key: 'duration', format: '_parseDuration'},
+        {key: 'heroName'},
+        null,
+        {key: 'heroLevel', format: '_parseInt'},
+        {key: 'isWon', format: '_parseBool'},
         {key: 'mmr', format: '_parseInt'},
-        {key: 'mmr_delta', format: '_parseInt'},
+        {key: 'mmrDelta', format: '_parseInt'},
         {key: 'date', format: '_parseDate'},
         null,
         null,
         null,
-        null
+        {key: 'heroRole'}
     ];
 
     constructor(playerId = 1350838) {
@@ -26,33 +26,45 @@ export default class HotsLogCrawler {
         this.crawler = new Crawler({maxConnections : 1});
     }
 
-    getGames(cb)
+    /**
+     * @returns {Promise}
+     */
+    getGames()
     {
-        this.crawler.queue([{
-            uri: this.gamesUrl+this.playerId,
+        return new Promise((resolve, reject) => {
+            this.crawler.queue([{
+                uri: this.gamesUrl + this.playerId,
 
-            // The global callback won't be called
-            callback: (error, res) => {
-                let games = [];
+                // The global callback won't be called
+                callback: (error, res) => {
+                    if (error) {
+                        reject(error);
+                    }
 
-                let isFirst = true;
-                let $ = res.$;
-                let lines = $('table.rgMasterTable tr');
-                lines.each((i, el1) => {
-                    let replay = {};
-                    $(el1).children().each((i, el2) => {
-                        if (!isFirst && null !== this.keys[i]) {
-                            games[this.keys[i].key] = HotsLogCrawler._sanitize($(el2).text(), this.keys[i]);
+                    let games = [];
+                    let $ = res.$;
+                    let lines = $('table.rgMasterTable tr');
+                    if (0 === lines.length) {
+                        reject([]);
+                    }
+                    lines.each((i, el1) => {
+                        let replay = {};
+                        $(el1).children().each((i, el2) => {
+                            if (null !== this.keys[i]) {
+                                let value = $(el2).text();
+                                replay[this.keys[i].key] = HotsLogCrawler._sanitize(value, this.keys[i]);
+                            }
+                        });
+
+                        if (replay.replayId > 0) {
+                            games.push(replay);
                         }
                     });
 
-                    isFirst = false;
-                    games.push(replay);
-                });
-
-                cb(games);
-            }
-        }]);
+                    resolve(games);
+                }
+            }]);
+        });
     }
 
     /**
@@ -89,6 +101,20 @@ export default class HotsLogCrawler {
      */
     static _parseBool(value) {
         return value === '1';
+    }
+
+    /**
+     * @param value
+     * @returns {number}
+     * @private
+     */
+    static _parseDuration(value) {
+        let hours = 0, minutes = 0, seconds = 0;
+        if (null !== value) {
+            [hours, minutes, seconds] = value.split(':');
+        }
+
+        return parseInt(hours, 10)*60*60 + parseInt(minutes, 10)*60 + parseInt(seconds, 10);
     }
 
     /**
