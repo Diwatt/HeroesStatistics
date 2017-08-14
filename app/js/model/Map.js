@@ -1,13 +1,11 @@
-export default class Hero {
+export default class Map {
     /**
      * @return {*}
      */
     static getProperties() {
         return {
             id: Number,
-            name: String,
-            role: String,
-            subRole: String
+            name: String
         }
     }
 
@@ -15,6 +13,6 @@ export default class Hero {
      * @return {String}
      */
     static getSchema() {
-        return '++id,name,role,subRole'
+        return '++id,name'
     }
 }

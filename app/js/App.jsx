@@ -15,8 +15,9 @@ render((
             <nav className="navbar">
                 <div className="navbar-brand">
                     <NavLink to="/" className="navbar-item">Heroes Statistics</NavLink>
-                    <NavLink to="/selection" className="navbar-item is-hidden-desktop" activeClassName="is-active">Selection</NavLink>
-                    <NavLink to="/setup" className="navbar-item is-hidden-desktop" activeClassName="is-active">Setup</NavLink>
+                    <NavLink to="/selection" className="navbar-item" activeClassName="is-active">Selection</NavLink>
+                    <NavLink to="/setup" className="navbar-item" activeClassName="is-active">Setup</NavLink>
+                    <NavLink to="/reset" className="navbar-item" activeClassName="is-active">Reset</NavLink>
                 </div>
             </nav>
 

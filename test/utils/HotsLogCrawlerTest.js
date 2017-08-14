@@ -19,16 +19,17 @@ describe('HotsLogCrawler', function() {
         crawler.getGames().then((games) => {
             expect(games).to.be.a('array');
             expect(games).to.not.be.empty;
-            expect(games[0].replayId).to.be.a('number');
-            expect(games[0].mapName).to.be.a('string');
-            expect(games[0].duration).to.be.a('number');
-            expect(games[0].heroName).to.be.a('string');
-            expect(games[0].heroLevel).to.be.a('number');
-            //expect(games[0].isWon).to.be.a('bool');
-            expect(games[0].mmr).to.be.a('number');
-            expect(games[0].mmrDelta).to.be.a('number');
-            expect(games[0].date).to.be.a('object');
-            expect(games[0].heroRole).to.be.a('string');
+            let firstGame = games[games.length-1];
+            expect(firstGame.replayId).to.be.a('number');
+            expect(firstGame.mapName).to.be.a('string');
+            expect(firstGame.duration).to.be.a('number');
+            expect(firstGame.heroName).to.be.a('string');
+            expect(firstGame.heroLevel).to.be.a('number');
+            expect(firstGame.isWon).to.be.true;
+            expect(firstGame.mmr).to.be.a('number');
+            expect(firstGame.mmrDelta).to.be.a('number');
+            expect(firstGame.date).to.be.a('object');
+            expect(firstGame.heroRole).to.be.a('string');
             done();
         }).catch((e) => {
             done(e);

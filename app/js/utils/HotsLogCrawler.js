@@ -34,6 +34,7 @@ export default class HotsLogCrawler {
         return new Promise((resolve, reject) => {
             this.crawler.queue([{
                 uri: this.gamesUrl + this.playerId,
+                headers: {},
 
                 // The global callback won't be called
                 callback: (error, res) => {

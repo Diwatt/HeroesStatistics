@@ -10,12 +10,14 @@ export default class Setup extends React.Component {
     };
 
     componentDidMount() {
-        db.users.count().then((count) => {
+        db.users.where('isActive').equals(1).count().then((count) => {
             if (0 === count) {
                 this.setState({
                     userId: null
                 })
             }
+        }).catch((e) => {
+            console.log(e);
         });
     }
 
