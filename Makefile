@@ -25,8 +25,12 @@ APP_DIR=Tests/Fixtures/app
 
 install:
 	@echo installing...
-	sudo chown -R florian:staff ./node_modules/heroprotocol
-	python ./node_modules/heroprotocol/mpyq/setup.py install
+	rm -rf heroprotocol
+	wget -O heroprotocol.zip https://github.com/Blizzard/heroprotocol/archive/master.zip
+	unzip heroprotocol.zip
+	mv heroprotocol-master heroprotocol
+	python ./heroprotocol/mpyq/setup.py install
+	rm heroprotocol.zip
 
 sample:
-	python ./node_modules/heroprotocol/heroprotocol.py --messageevents Sample.StormReplay
+	python ./heroprotocol/heroprotocol.py --messageevents test/ReplayParser/Sample.StormReplay
