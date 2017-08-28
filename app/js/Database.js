@@ -1,10 +1,13 @@
 import Dexie from 'dexie';
 import Config from "./Config";
-import User from "./model/User";
-import Game from "./model/Game";
-import Hero from "./model/Hero";
-import Map from "./model/Map";
-import WinRate from "./model/WinRate";
+import User from "./models/User";
+import Game from "./models/Game";
+import Hero from "./models/Hero";
+import HeroTalent from "./models/HeroTalent";
+import Player from "./models/Player";
+import Statistic from "./models/Statistic";
+import Map from "./models/Map";
+import WinRate from "./models/WinRate";
 
 class DatabaseConnector
 {
@@ -29,6 +32,9 @@ class DatabaseConnector
             users: User.getSchema(),
             games: Game.getSchema(),
             heroes: Hero.getSchema(),
+            heroTalents: HeroTalent.getSchema(),
+            players: Player.getSchema(),
+            statistics: Statistic.getSchema(),
             maps: Map.getSchema(),
             winRates: WinRate.getSchema(),
         });
@@ -64,8 +70,7 @@ class DatabaseConnector
         console.log ("Database version: " + db.verno);
         db.tables.forEach(function (table) {
             console.log ("Found table: " + table.name);
-            console.log ("Table Schema: " +
-                JSON.stringify(table.schema, null, 4));
+            console.log ("Table Schema: ",  table.schema);
         });
     }
 }

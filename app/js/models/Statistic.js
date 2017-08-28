@@ -1,11 +1,15 @@
-export default class Map {
+import Dexie from 'dexie';
+import db from '../Database';
+
+export default class Statistic {
     /**
      * @return {*}
      */
     static getProperties() {
         return {
             id: Number,
-            name: String
+            name: String,
+            value: Number
         }
     }
 
@@ -13,6 +17,6 @@ export default class Map {
      * @return {String}
      */
     static getSchema() {
-        return '++id,name'
+        return '++id,name,value'
     }
 }

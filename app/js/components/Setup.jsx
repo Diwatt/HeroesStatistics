@@ -1,65 +1,48 @@
 import React from "react";
-import {Link} from "react-router-dom";
+import Dexie from 'dexie';
 import db from './../Database';
 import Crawler from './../utils/HotsLogCrawler';
+import CreateUser from "./Setup/CreateUser";
+import RetrieveGames from "./Setup/RetrieveGames";
+import User from './../models/User';
 
 export default class Setup extends React.Component {
     state = {
-        userId: null,
-        hotslogsId: undefined,
+        user: null,
+        nbGames: 0
     };
 
     componentDidMount() {
-        db.users.where('isActive').equals(1).count().then((count) => {
-            if (0 === count) {
-                this.setState({
-                    userId: null
-                })
-            }
-        }).catch((e) => {
-            console.log(e);
+        User.getActive().then((user) => {
+            this.setState({user: user});
+        })
+    }
+
+    /**
+     * Called by <CreateUser>
+     *
+     * @param event
+     * @param id
+     */
+    createUser(event, id) {
+        User.create(id).then((user) => {
+            this.setState({user: user});
         });
     }
 
-    handleHotslogId(event) {
-        this.setState({hotslogsId: event.target.value});
-    }
-
-    createUser(event) {
-        console.log('paf')
-    }
-
-    getForm() {
-        return (<div className="field is-horizontal">
-            <div className="field-label is-normal">
-                <label className="label">Specify your hotlogs id:</label>
-            </div>
-            <div className="field-body">
-                <div className="field has-addons">
-                    <div className="control">
-                        <input className="input" type="number"
-                               value={this.state.hotslogsId}
-                               onChange={(e) => this.handleHotslogId(e)}
-                        />
-                    </div>
-                    <div className="control">
-                        <button onClick={(e) => this.createUser(e)} className="button is-info">
-                            Save
-                        </button>
-                    </div>
-                </div>
-            </div>
-        </div>);
-    }
-
     render() {
-        if (null === this.state.userId) {
-            return this.getForm();
+        if (null === this.state.user) {
+            return <CreateUser createUserCallback={this.createUser.bind(this)}/>;
         }
 
+        if (0 === this.state.nbGames) {
+            return <RetrieveGames />;
+        }
 
         return (
             <div>
+                <h1 className="title">Setup</h1>
+
                 Setup
             </div>
         );

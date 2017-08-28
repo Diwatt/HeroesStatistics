@@ -1,4 +1,4 @@
-export default class Hero {
+export default class HeroTalent {
     /**
      * @return {*}
      */
@@ -6,8 +6,8 @@ export default class Hero {
         return {
             id: Number,
             name: String,
-            role: String,
-            subRole: String
+            description: String,
+            image: Blob
         }
     }
 
@@ -15,6 +15,6 @@ export default class Hero {
      * @return {String}
      */
     static getSchema() {
-        return '++id,name,role,subRole'
+        return '++id,name,description,image,[name+description]'
     }
 }

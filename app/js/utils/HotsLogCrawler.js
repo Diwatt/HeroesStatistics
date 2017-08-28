@@ -1,39 +1,46 @@
-import Crawler from "crawler";
-import moment from "moment";
+import Crawler from 'crawler';
+import 'isomorphic-fetch';
+import HistoryConfigurator from './HotsLogsHistoryConfigurator';
+import SummaryConfigurator from './HotsLogSummaryConfigurator';
 
 export default class HotsLogCrawler {
-    gamesUrl = 'https://www.hotslogs.com/Player/MatchHistory?PlayerID=';
-    keys = [
-        null,
-        {key: 'replayId', format: '_parseInt'},
-        {key: 'mapName'},
-        {key: 'duration', format: '_parseDuration'},
-        {key: 'heroName'},
-        null,
-        {key: 'heroLevel', format: '_parseInt'},
-        {key: 'isWon', format: '_parseBool'},
-        {key: 'mmr', format: '_parseInt'},
-        {key: 'mmrDelta', format: '_parseInt'},
-        {key: 'date', format: '_parseDate'},
-        null,
-        null,
-        null,
-        {key: 'heroRole'}
-    ];
+    heroesUrl = 'https://api.hotslogs.com/Public/Data/Heroes';
+    mapsUrl = 'https://api.hotslogs.com/Public/Data/Maps';
 
     constructor(playerId = 1350838) {
         this.playerId = playerId;
-        this.crawler = new Crawler({maxConnections : 1});
+    }
+
+    /**
+     * @return Promise
+     */
+    getHeroes() {
+        return fetch(this.heroesUrl)
+            .then((response) => {
+                return response.json();
+            })
+        ;
+    }
+
+    /**
+     * @return Promise
+     */
+    getMaps() {
+        return fetch(this.mapsUrl)
+            .then((response) => {
+                return response.json();
+            })
+        ;
     }
 
     /**
      * @returns {Promise}
      */
-    getGames()
-    {
+    getGames() {
         return new Promise((resolve, reject) => {
-            this.crawler.queue([{
-                uri: this.gamesUrl + this.playerId,
+            let config = new HistoryConfigurator();
+            this._getCrawler().queue([{
+                uri: config.url + this.playerId,
                 headers: {},
 
                 // The global callback won't be called
@@ -42,25 +49,11 @@ export default class HotsLogCrawler {
                         reject(error);
                     }
 
-                    let games = [];
-                    let $ = res.$;
-                    let lines = $('table.rgMasterTable tr');
-                    if (0 === lines.length) {
+                    let games = config.parseTable(res.$);
+
+                    if (0 === games.length) {
                         reject([]);
                     }
-                    lines.each((i, el1) => {
-                        let replay = {};
-                        $(el1).children().each((i, el2) => {
-                            if (null !== this.keys[i]) {
-                                let value = $(el2).text();
-                                replay[this.keys[i].key] = HotsLogCrawler._sanitize(value, this.keys[i]);
-                            }
-                        });
-
-                        if (replay.replayId > 0) {
-                            games.push(replay);
-                        }
-                    });
 
                     resolve(games);
                 }
@@ -69,61 +62,64 @@ export default class HotsLogCrawler {
     }
 
     /**
-     * @param {*} value
-     * @param {Object} definition
-     * @private
+     *
+     * @param {Number} replayId
+     * @return {Promise}
      */
-    static _sanitize (value, definition) {
-        let sanitizedValue = value.trim();
+    getGameSummary(replayId) {
+        return new Promise((resolve, reject) => {
+            let config = new SummaryConfigurator();
+            this._getCrawler().queue([{
+                uri: config.url + replayId,
+                headers: {},
 
-        if ('' === sanitizedValue) {
-            sanitizedValue = null;
-        }
-        if (definition.format != undefined) {
-            sanitizedValue = HotsLogCrawler[definition.format](sanitizedValue);
-        }
+                // The global callback won't be called
+                callback: (error, res) => {
+                    if (error) {
+                        reject(error);
+                    }
 
-        return sanitizedValue;
+                    let talentTrees = config.parseTable(res.$, 'talentSelector', 'talentKeys', 'verifyTalent');
+                    let gameStatistics = config.parseTable(res.$, 'statisticsSelector', 'statisticsKeys');
+
+                    let summaryOfplayers = [];
+                    let playerNames = [];
+                    talentTrees.forEach((tt) => {
+                        playerNames.push(tt.playerName);
+                        let summary = {
+                            playerName: tt.playerName,
+                            heroName: tt.heroName,
+                            heroLevel: tt.heroLevel,
+                            hasWon: tt.hasWon,
+                            award: tt.award,
+                            talentTree: tt,
+                        };
+                        delete summary.talentTree.playerName;
+                        delete summary.talentTree.award;
+                        delete summary.talentTree.heroName;
+                        delete summary.talentTree.heroLevel;
+                        delete summary.talentTree.hasWon;
+
+                        summaryOfplayers[playerNames.indexOf(summary.playerName)] = summary;
+                    });
+
+                    gameStatistics.forEach((gs) => {
+                        let index = playerNames.indexOf(gs.playerName);
+                        summaryOfplayers[index].statistics = gs ;
+                        delete summaryOfplayers[index].statistics.playerName;
+                    });
+
+                    resolve(summaryOfplayers);
+                }
+            }]);
+        });
     }
 
     /**
-     * @param value
-     * @returns {boolean}
+     * @return {Crawler}
      * @private
      */
-    static _parseInt(value) {
-        return parseInt(value, 10);
-    }
-
-    /**
-     * @param value
-     * @returns {boolean}
-     * @private
-     */
-    static _parseBool(value) {
-        return value === '1';
-    }
-
-    /**
-     * @param value
-     * @returns {number}
-     * @private
-     */
-    static _parseDuration(value) {
-        let hours = 0, minutes = 0, seconds = 0;
-        if (null !== value) {
-            [hours, minutes, seconds] = value.split(':');
-        }
-
-        return parseInt(hours, 10)*60*60 + parseInt(minutes, 10)*60 + parseInt(seconds, 10);
-    }
-
-    /**
-     * @param date
-     * @returns {*|moment.Moment}
-     * @private
-     */
-    static _parseDate(date) {
-        return moment(date, "MM-DD-YYYY");
+    _getCrawler() {
+        return new Crawler({maxConnections : 1})
     }
 }
