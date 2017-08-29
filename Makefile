@@ -57,3 +57,6 @@ write-last-commit:
 
 sample:
 	./bin/heroprotocol --messageevents test/ReplayParser/Sample.StormReplay
+
+vm:
+	VBoxManage startvm adb7e499-b14d-4573-91d8-7ebe438b99a5 --type headless
