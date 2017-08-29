@@ -21,16 +21,39 @@ help:
 	} \
 	{ lastLine = $$0 }' $(MAKEFILE_LIST)
 
-APP_DIR=Tests/Fixtures/app
+LASTCOMMIT = `cat ./bin/last-commit.version`
 
 install:
 	@echo installing...
+	node ./scripts/last-commit.js current.version
+	@echo $(LASTCOMMIT)
 	rm -rf heroprotocol
 	wget -O heroprotocol.zip https://github.com/Blizzard/heroprotocol/archive/master.zip
 	unzip heroprotocol.zip
 	mv heroprotocol-master heroprotocol
-	python ./heroprotocol/mpyq/setup.py install
+	cd ./heroprotocol/mpyq && python setup.py install
 	rm heroprotocol.zip
+	rm bin/current.version
+
+build-command:
+	@echo building scripts...
+	node ./scripts/build-command.js
+
+build: build-command
+	@echo building...
+	rm -rf bin/
+	chmod +x ./scripts/build.sh
+	./scripts/build.sh
+	rm -rf ./scripts/build.sh
+
+build-binary: install build write-last-commit clean-build
+
+clean-build:
+	@echo cleaning...
+	rm -rf heroprotocol/
+
+write-last-commit:
+	node ./scripts/last-commit.js
 
 sample:
-	python ./heroprotocol/heroprotocol.py --messageevents test/ReplayParser/Sample.StormReplay
+	./bin/heroprotocol --messageevents test/ReplayParser/Sample.StormReplay
