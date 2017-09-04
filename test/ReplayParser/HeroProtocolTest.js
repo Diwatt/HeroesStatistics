@@ -4,7 +4,7 @@ import fs from 'fs';
 import path from 'path';
 
 describe('HeroProtocol', function() {
-    const hp = new HeroProtocol(__dirname+path.sep+'Sample.StormReplay');
+    const hp = new HeroProtocol(__dirname+path.sep+'Sample.StormReplay', true);
 
     it('should find heroprotocol', function () {
         expect(hp.binPath).to.not.be.null;
@@ -18,7 +18,10 @@ describe('HeroProtocol', function() {
         hp.getGameEvents().then(data => {
             elapsedTime = Date.now() - start;
             expect(data).to.not.be.null;
-            expect(data).to.be.a('array');
+            expect(data.events).to.not.be.null;
+            expect(data.events).to.be.a('array');
+            expect(data.stats).to.not.be.null;
+            expect(data.stats).to.be.a('array');
 
             return data;
         }).then(data => {
@@ -26,8 +29,8 @@ describe('HeroProtocol', function() {
             hp.getGameEvents().then(newdata => {
                 let newElapsedTime = Date.now() - start;
                 expect(newdata).to.not.be.null;
-                expect(data).to.be.a('array');
-                expect(newdata.length).to.be.equals(data.length);
+                expect(data.events).to.be.a('array');
+                expect(newdata.events.length).to.be.equals(data.events.length);
                 expect(newElapsedTime).to.not.be.above(elapsedTime);
 
                 done();
@@ -42,7 +45,9 @@ describe('HeroProtocol', function() {
     it('should return message events', function (done) {
         hp.getMessageEvents().then(data => {
             expect(data).to.not.be.null;
-            expect(data).to.be.a('array');
+            expect(data.events).to.be.a('array');
+            expect(data.stats).to.not.be.null;
+            expect(data.stats).to.be.a('array');
             done();
         }).catch(err => {
             done(err);
@@ -52,7 +57,9 @@ describe('HeroProtocol', function() {
     it('should return attributes event', function (done) {
         hp.getAttributesEvents().then(data => {
             expect(data).to.not.be.null;
-            expect(data).to.be.a('array');
+            expect(data.events).to.be.a('array');
+            expect(data.stats).to.not.be.null;
+            expect(data.stats).to.be.a('array');
             done();
         }).catch(err => {
             done(err);
@@ -62,7 +69,9 @@ describe('HeroProtocol', function() {
     it('should return tracker events', function (done) {
         hp.getTrackerEvents().then(data => {
             expect(data).to.not.be.null;
-            expect(data).to.be.a('array');
+            expect(data.events).to.be.a('array');
+            expect(data.stats).to.not.be.null;
+            expect(data.stats).to.be.a('array');
             done();
         }).catch(err => {
             done(err);
@@ -72,7 +81,7 @@ describe('HeroProtocol', function() {
     it('should return header', function (done) {
         hp.getHeader().then(data => {
             expect(data).to.not.be.null;
-            expect(data).to.be.a('object');
+            expect(data.header).to.be.a('object');
             done();
         }).catch(err => {
             done(err);
@@ -82,7 +91,7 @@ describe('HeroProtocol', function() {
     it('should return details', function (done) {
         hp.getDetails().then(data => {
             expect(data).to.not.be.null;
-            expect(data).to.be.a('object');
+            expect(data.details).to.be.a('object');
             done();
         }).catch(err => {
             done(err);
@@ -92,7 +101,7 @@ describe('HeroProtocol', function() {
     it('should return init data', function (done) {
         hp.getInitData().then(data => {
             expect(data).to.not.be.null;
-            expect(data).to.be.a('object');
+            expect(data.initdata).to.be.a('object');
             done();
         }).catch(err => {
             done(err);
