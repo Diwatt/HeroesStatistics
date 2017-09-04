@@ -112,7 +112,7 @@
   },
   "scripts": {
     "start": "concurrently \"electron ./app/\" \"webpack --config webpack.config.js app/js/App.jsx app/dist/App.js\"",
-    "test": "mocha --compilers js:babel-register --timeout 30000 --recursive"
+    "test": "mocha --compilers js:babel-register --timeout 100000 --recursive"
   },
   "jest": {}
 }
