@@ -41,7 +41,6 @@ build-command:
 
 build: build-command
 	@echo building...
-	rm -rf bin/
 	chmod +x ./scripts/build.sh
 	./scripts/build.sh
 	rm -rf ./scripts/build.sh
@@ -56,7 +55,7 @@ write-last-commit:
 	node ./scripts/last-commit.js
 
 sample:
-	./bin/heroprotocol --messageevents test/ReplayParser/Sample.StormReplay
+	./bin/heroprotocol --messageevents --stats test/ReplayParser/Sample.StormReplay
 
 vm:
-	VBoxManage startvm adb7e499-b14d-4573-91d8-7ebe438b99a5 --type headless
+	VBoxManage startvm adb7e499-b14d-4573-91d8-7ebe438b99a5

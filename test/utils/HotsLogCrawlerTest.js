@@ -40,7 +40,7 @@ describe('HotsLogCrawler', function() {
         });
     });
 
-    it('getGameSummary should return player games', (done) => {
+    xit('getGameSummary should return player games', (done) => {
         crawler.getGameSummary(120859507).then((summaries) => {
             expect(summaries).to.be.a('array');
             expect(summaries).to.not.be.empty;
