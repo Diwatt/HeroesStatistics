@@ -55,7 +55,4 @@ write-last-commit:
 	node ./scripts/last-commit.js
 
 sample:
-	./bin/heroprotocol --messageevents --stats test/ReplayParser/Sample.StormReplay
-
-vm:
-	VBoxManage startvm adb7e499-b14d-4573-91d8-7ebe438b99a5
+	./bin/heroprotocol --trackerevents --stats test/ReplayParser/Sample.StormReplay

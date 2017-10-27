@@ -11,23 +11,21 @@ export default class Hero {
      * @param {Array} heroes
      * @return {Promise}
      */
-    static importFromHotlogs(heroes) {
-        return Dexie.spawn(function* () {
-            return yield db.transaction('rw', db.heroes, function* () {
-                let gameHeroes = [];
-                for (let i = 0; i < heroes.length; i++) {
-                    let isInDb = yield db.heroes.where('name').equals(heroes[i].PrimaryName).count();
-                    if (0 === isInDb) {
-                        gameHeroes.push({
-                            name: heroes[i].PrimaryName,
-                            role: heroes[i].Group,
-                            subRole: heroes[i].SubGroup
-                        })
-                    }
+    static async importFromHotlogs(heroes) {
+        return await db.transaction('rw', db.heroes, async () => {
+            let gameHeroes = [];
+            for (let i = 0; i < heroes.length; i++) {
+                let isInDb = await db.heroes.where('name').equals(heroes[i].PrimaryName).count();
+                if (0 === isInDb) {
+                    gameHeroes.push({
+                        name: heroes[i].PrimaryName,
+                        role: heroes[i].Group,
+                        subRole: heroes[i].SubGroup
+                    })
                 }
+            }
 
-                yield db.heroes.bulkAdd(gameHeroes);
-            });
+            await db.heroes.bulkAdd(gameHeroes);
         });
     }
 
@@ -41,12 +39,12 @@ export default class Hero {
             role: String,
             subRole: String,
             talents1: Array,
-            talents2: Array,
-            talents3: Array,
             talents4: Array,
-            talents5: Array,
-            talents6: Array,
             talents7: Array,
+            talents10: Array,
+            talents13: Array,
+            talents16: Array,
+            talents20: Array,
         }
     }
 
@@ -54,6 +52,6 @@ export default class Hero {
      * @return {String}
      */
     static getSchema() {
-        return '++id,name,role,subRole,*talents1,*talents2,*talents3,*talents4,*talents5,*talents6,*talents7'
+        return '++id,name,role,subRole,*talents1,*talents4,*talents7,*talents10,*talents13,*talents16,*talents20'
     }
 }

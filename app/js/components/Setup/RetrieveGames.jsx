@@ -26,10 +26,16 @@ export default class RetrieveGames extends React.Component {
                 this.setState({textStatus: 'Retrieving games '+textStatus});
             });
             this.setState({textStatus: 'Retrieving summaries'});
-            await Game.importSummaryFromHotsLogs(crawler);
+            await Game.importSummaryFromHotsLogs(async (id, waitUntil) => {
+                return await crawler.getGameSummary(id, waitUntil);
+            }, 1500);
         }).then(() => {
             this.setState({'inProgress': false});
         });
+    }
+
+    componentWillUnmount() {
+
     }
 
     render() {

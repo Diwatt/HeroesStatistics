@@ -6,19 +6,18 @@ import Crawler from './../utils/HotsLogCrawler';
 
 export default class Home extends React.Component {
     getHeroes() {
-        let heroes = Dexie.spawn(function* () {
-            yield db.heroes.toArray();
+        let heroes = db.heroes.toArray().then(heroes => {
+            console.log('heroes:', heroes);
         });
-
-        console.log(heroes);
     }
 
     render() {
-
         this.getHeroes();
         User.getActive().then(async (user) => {
-            const crawler = new Crawler(user.hotslogsUserId);
-            crawler.getGameSummary(119328995);
+            if (null !== user) {
+                const crawler = new Crawler(user.hotslogsUserId);
+                crawler.getGameSummary(119328995);
+            }
         });
 
         return (

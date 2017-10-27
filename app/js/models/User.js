@@ -5,17 +5,15 @@ export default class User {
     /**
      * @return {Promise}
      */
-    static getActive() {
-        return Dexie.spawn(function* () {
-            let Collection = yield db.users.where('isActive').equals(1);
-            let CollectionCount = yield Collection.count();
-            let user = null;
-            if (CollectionCount > 0) {
-                user = yield Collection.first();
-            }
+    static async getActive() {
+        let Collection = await db.users.where('isActive').equals(1);
+        let CollectionCount = await Collection.count();
+        let user = null;
+        if (CollectionCount > 0) {
+            user = await Collection.first();
+        }
 
-            return user;
-        });
+        return user;
     }
 
     /**
@@ -30,31 +28,29 @@ export default class User {
      * @param {String} battleTag
      * @return {Promise}
      */
-    static create(id, battleTag = null) {
-        return Dexie.spawn(function* () {
-            return yield db.transaction('rw', db.users, function* () {
-                let Collection = yield db.users.where('hotslogsUserId').equals(id);
-                let CollectionCount = yield Collection.count();
+    static async create(id, battleTag = null) {
+        return await db.transaction('rw', db.users, async () => {
+            let Collection = await db.users.where('hotslogsUserId').equals(id);
+            let CollectionCount = await Collection.count();
 
-                let user = null;
-                if (CollectionCount > 0) {
-                    user = yield Collection.first();
-                    yield db.users.where('id').notEqual(user.id).modify({'isActive': 0})
-                    yield Collection.modify({'isActive': 1});
-                    user = yield Collection.first();
+            let user = null;
+            if (CollectionCount > 0) {
+                user = await Collection.first();
+                await db.users.where('id').notEqual(user.id).modify({'isActive': 0})
+                await Collection.modify({'isActive': 1});
+                user = await Collection.first();
 
-                    console.log('User modified', user);
-                } else {
-                    user = yield db.users.add({
-                        hotslogsUserId: id,
-                        battleTag: battleTag,
-                        isActive: 1
-                    });
-                    console.log('User created', user);
-                }
+                console.log('User modified', user);
+            } else {
+                user = await db.users.add({
+                    hotslogsUserId: id,
+                    battleTag: battleTag,
+                    isActive: 1
+                });
+                console.log('User created', user);
+            }
 
-                return user;
-            });
+            return user;
         });
     }
 

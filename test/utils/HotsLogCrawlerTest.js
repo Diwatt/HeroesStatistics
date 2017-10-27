@@ -40,7 +40,7 @@ describe('HotsLogCrawler', function() {
         });
     });
 
-    xit('getGameSummary should return player games', (done) => {
+    it('getGameSummary should return player games', (done) => {
         crawler.getGameSummary(120859507).then((summaries) => {
             expect(summaries).to.be.a('array');
             expect(summaries).to.not.be.empty;
@@ -57,12 +57,12 @@ describe('HotsLogCrawler', function() {
             expect(mySummary.talentTree.talent1.description).to.be.a('string');
             expect(mySummary.talentTree.talent1.description).to.be.equals('Increases range');
             expect(mySummary.talentTree.talent1.image).to.be.a('string');
-            expect(mySummary.talentTree.talent2).to.be.a('object');
-            expect(mySummary.talentTree.talent3).to.be.a('object');
             expect(mySummary.talentTree.talent4).to.be.a('object');
-            expect(mySummary.talentTree.talent5).to.be.a('object');
-            expect(mySummary.talentTree.talent6).to.be.a('object');
             expect(mySummary.talentTree.talent7).to.be.a('object');
+            expect(mySummary.talentTree.talent10).to.be.a('object');
+            expect(mySummary.talentTree.talent13).to.be.a('object');
+            expect(mySummary.talentTree.talent16).to.be.a('object');
+            expect(mySummary.talentTree.talent20).to.be.a('object');
             expect(mySummary.statistics).to.be.a('object');
             expect(mySummary.statistics.score).to.be.a('number');
             expect(mySummary.statistics.score).to.be.equals(60.7);
