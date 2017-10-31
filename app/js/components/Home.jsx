@@ -7,7 +7,7 @@ import Crawler from './../utils/HotsLogCrawler';
 export default class Home extends React.Component {
     getHeroes() {
         let heroes = db.heroes.toArray().then(heroes => {
-            console.log('heroes:', heroes);
+            console.info('heroes:', heroes);
         });
     }
 

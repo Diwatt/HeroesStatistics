@@ -32,7 +32,7 @@ export default class Cache {
      */
     save(url, data) {
         let filename = this._getCacheFilename(url);
-        console.log('saving '+url+' into '+path.basename(filename));
+        console.info('saving '+url+' into '+path.basename(filename));
 
         fs.writeFileSync(filename, data);
     }
@@ -71,7 +71,10 @@ export default class Cache {
      * @return {Buffer | string}
      */
     fetch(url) {
-        return fs.readFileSync(this._getCacheFilename(url)).toString();
+        let filename = this._getCacheFilename(url);
+        console.info('reading '+filename);
+
+        return fs.readFileSync(filename).toString();
     }
 
     /**

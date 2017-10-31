@@ -66,11 +66,11 @@ class DatabaseConnector
      * @private
      */
     _debug(db) {
-        console.log ("Found database: " + db.name);
-        console.log ("Database version: " + db.verno);
+        console.info("Found database: " + db.name);
+        console.info("Database version: " + db.verno);
         db.tables.forEach(function (table) {
-            console.log ("Found table: " + table.name);
-            console.log ("Table Schema: ",  table.schema);
+            console.info("Found table: " + table.name);
+            console.info("Table Schema: ",  table.schema);
         });
     }
 }

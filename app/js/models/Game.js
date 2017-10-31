@@ -90,7 +90,7 @@ export default class Game {
                     let talent7 = await db.heroTalents.add(yield Game._addTalent(summary.talent7));
 
                     let hero = yield db.heroes.where('name').equals(summary.heroName).first();
-                    //console.log(hero.talents1);
+                    //console.info(hero.talents1);
                 }*/
             }
         });

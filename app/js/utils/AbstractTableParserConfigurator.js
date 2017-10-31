@@ -60,7 +60,25 @@ export default class AbstractTableParserConfigurator {
      * @private
      */
     _parseInt(value) {
-        return parseInt(value, 10);
+        if (null === value) {
+            return 0;
+        }
+        return parseInt(value.replace(' ', ''), 10);
+    }
+
+    /**
+     * @param value
+     * @returns {boolean}
+     * @private
+     */
+    _parsePercent(value) {
+        if (null === value || '' === value.trim()) {
+            return 0;
+        }
+
+        let v = value.replace('%', '').replace(',', '.').trim();
+
+        return parseFloat(v);
     }
 
     /**

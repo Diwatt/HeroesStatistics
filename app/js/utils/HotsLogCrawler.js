@@ -2,6 +2,7 @@ import Crawler from 'crawler';
 import crypto from 'crypto';
 import 'isomorphic-fetch';
 import Cache from './Cache';
+import HomeConfigurator from './HotsLogsHomeConfigurator';
 import HistoryConfigurator from './HotsLogsHistoryConfigurator';
 import SummaryConfigurator from './HotsLogSummaryConfigurator';
 import snooze from './../utils/Snooze';
@@ -24,39 +25,44 @@ export default class HotsLogCrawler {
      * @return Promise
      */
     getHeroes() {
-        return new Promise(resolve => {
-            if (this.cache.has(this.heroesUrl)) {
-                try {
-                    resolve(JSON.parse(this.cache.fetch(this.heroesUrl)));
-                } catch (err) {}
-            }
-
-            fetch(this.heroesUrl).then((response) => {
-                return response.json();
-            }).then((data) => {
-                this.cache.save(this.heroesUrl, JSON.stringify(data));
-                resolve(data);
-            });
-        });
+        return this._fetchJson(this.heroesUrl);
     }
 
     /**
      * @return Promise
      */
     getMaps() {
-        return new Promise(resolve => {
-            if (this.cache.has(this.mapsUrl)) {
-                try {
-                    resolve(JSON.parse(this.cache.fetch(this.mapsUrl)));
-                } catch (err) {}
-            }
+        return this._fetchJson(this.mapsUrl);
+    }
 
-            fetch(this.mapsUrl).then((response) => {
-                return response.json();
-            }).then((data) => {
-                this.cache.save(this.mapsUrl, JSON.stringify(data));
-                resolve(data);
-            });
+    /**
+     * @returns {Promise}
+     */
+    getHeroesBasics() {
+        return new Promise((resolve, reject) => {
+            let config = new HomeConfigurator();
+
+            let url = config.url;
+            let queueConfig = {
+                // The global callback won't be called
+                callback: (error, response) => {
+                    if (error) {
+                        reject(error);
+                    }
+
+                    let heroes = config.parseTable(response.$);
+                    console.info(heroes);
+
+                    if (0 === heroes.length) {
+                        reject([]);
+                    }
+
+                    this._save(url, response.body);
+                    resolve(heroes);
+                }
+            };
+
+            this._fetchHtml(url, queueConfig);
         });
     }
 
@@ -81,12 +87,12 @@ export default class HotsLogCrawler {
                         reject([]);
                     }
 
-                    this.cache.save(url, response.body);
+                    this._save(url, response.body);
                     resolve(games);
                 }
             };
 
-            this._fetch(url, queueConfig);
+            this._fetchHtml(url, queueConfig);
         });
     }
 
@@ -140,13 +146,7 @@ export default class HotsLogCrawler {
                         });
 
                         //save cache to avoid too many call
-                        if (!this.cache.has(url)) {
-                            this.cache.save(url, response.body);
-                        } else {
-                            if (response.body !== this.cache.fetch(url)) {
-                                this.cache.save(url, response.body);
-                            }
-                        }
+                        this._save(url, response.body);
                         resolve(summaryOfplayers);
                     } catch (err) {
                         console.log(err);
@@ -155,7 +155,7 @@ export default class HotsLogCrawler {
                 }
             };
 
-            this._fetch(url, queueConfig, waitUntil);
+            this._fetchHtml(url, queueConfig, waitUntil);
         });
     }
 
@@ -166,20 +166,67 @@ export default class HotsLogCrawler {
      * @param {Number} waitUntil
      * @private
      */
-    async _fetch(url, config, waitUntil = 1000) {
-        if (!this.cache.has(url)) {
-            console.log('fetching '+url+' from web');
+    async _fetchHtml(url, config, waitUntil = 1000) {
+        if (!this.cache.has(url) && navigator.onLine) {
             await snooze(waitUntil);
+            console.info('fetching '+url+' from web');
             let response = await fetch(url);
             let html = await response.text();
             this.cache.save(url, html);
 
             config.html = this.cache.fetch(url);
             this._getCrawler().queue([config]);
-        } else {
+        } else if (this.cache.has(url)) {
             config.html = this.cache.fetch(url);
-            console.log('fetching '+url+' from cache');
+            console.info('fetching '+url+' from cache');
             this._getCrawler().queue([config]);
+        } else {
+            console.error('no connection and no cache');
+        }
+    }
+
+    /**
+     * @param {string} url
+     * @param {Number} waitUntil
+     * @return Promise
+     */
+    async _fetchJson(url, waitUntil = 1000) {
+        await snooze(waitUntil);
+        if (this.cache.has(url)) {
+            try {
+                let data = JSON.parse(this.cache.fetch(url));
+                console.info('fetching '+url+' from cache');
+
+                return data;
+            } catch (err) {}
+        }
+
+        if (navigator.onLine) {
+            console.info('fetching ' + url + ' from cache');
+            let response = await fetch(url);
+            let data = await response.json();
+            this.cache.save(url, JSON.stringify(data));
+        } else {
+            console.error('Cannot retrieve ' + url + ' from web');
+        }
+
+        return data;
+    }
+
+
+
+    /**
+     *
+     * @param {String} url
+     * @param {String} content
+     * @private
+     */
+    _save(url, content) {
+        //save cache to avoid too many call
+        if (!this.cache.has(url)) {
+            this.cache.save(url, content);
+        } else if (content !== this.cache.fetch(url)) {
+            this.cache.save(url, content);
         }
     }
 

@@ -40,14 +40,14 @@ export default class User {
                 await Collection.modify({'isActive': 1});
                 user = await Collection.first();
 
-                console.log('User modified', user);
+                console.info('User modified', user);
             } else {
                 user = await db.users.add({
                     hotslogsUserId: id,
                     battleTag: battleTag,
                     isActive: 1
                 });
-                console.log('User created', user);
+                console.info('User created', user);
             }
 
             return user;
