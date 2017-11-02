@@ -29,6 +29,10 @@ export default class Hero {
         });
     }
 
+    static async updateFromBasics(heroes) {
+
+    }
+
     /**
      * @return {*}
      */

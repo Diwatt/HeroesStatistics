@@ -19,8 +19,8 @@ export default class RetrieveGames extends React.Component {
             const crawler = new Crawler(user.hotslogsUserId);
             this.setState({textStatus: 'Retrieving heroes'});
             await Hero.importFromHotlogs(await crawler.getHeroes());
-            await crawler.getHeroesAverageWinrate();
-            return;
+            this.setState({textStatus: 'Retrieving basics'});
+            await Hero.updateFromBasics(await crawler.getHeroesBasics());
             this.setState({textStatus: 'Retrieving maps'});
             await Map.importFromHotlogs(await crawler.getMaps());
             this.setState({textStatus: 'Retrieving games'});
