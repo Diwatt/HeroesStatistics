@@ -1,3 +1,4 @@
+import "babel-polyfill";
 import Dexie from 'dexie';
 import Config from "./Config";
 import User from "./models/User";
@@ -66,12 +67,14 @@ class DatabaseConnector
      * @private
      */
     _debug(db) {
+        console.groupCollapsed('db');
         console.info("Found database: " + db.name);
         console.info("Database version: " + db.verno);
         db.tables.forEach(function (table) {
             console.info("Found table: " + table.name);
             console.info("Table Schema: ",  table.schema);
         });
+        console.groupEnd('db');
     }
 }
 

@@ -12,7 +12,7 @@ describe('Cache', function() {
     let url = 'http://google.fr';
     let content = 'test123';
     let hash = crypto.createHash('md5').update(url).digest('hex');
-    let filename = dir + path.sep + hash + '.html';
+    let filename = dir + path.sep + hash;
 
     it('should save a file', () => {
         cache.save(url, content);

@@ -60,7 +60,8 @@
     "css-loader": "^0.28.7",
     "electron-builder": "^19.42.1",
     "electron-devtools-installer": "^2.2.1",
-    "enzyme": "^3.1.0",
+    "enzyme": "^3.1.1",
+    "enzyme-adapter-react-16": "^1.0.4",
     "enzyme-to-json": "^3.1.4",
     "event-stream": "^3.3.4",
     "jest": "^21.2.1",
@@ -80,7 +81,8 @@
   },
   "scripts": {
     "start": "concurrently \"electron ./app/\" \"webpack --config webpack.config.js app/js/App.jsx app/dist/App.js\"",
-    "test": "mocha --compilers js:babel-register --timeout 100000 --recursive"
+    "test": "mocha --require babel-register --timeout 100000 --recursive",
+    "compile": "webpack --config webpack.config.js app/js/App.jsx app/dist/App.js"
   },
   "jest": {}
 }

@@ -6,7 +6,7 @@ export default class HotsLogsHomeConfigurator extends AbstractTableParserConfigu
     selector = 'table.rgMasterTable > tbody > tr';
     keys = [
         null,
-        {key: 'heroName'},
+        {key: 'name'},
         {key: 'playedGames', 'format': '_parseInt'},
         {key: 'banned', 'format': '_parseInt'},
         {key: 'pickRate', 'format': '_parsePercent'},

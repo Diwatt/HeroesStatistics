@@ -53,6 +53,8 @@ export default class Cache {
 
                 return isValid;
             }
+
+            return true;
         }
 
         return false;

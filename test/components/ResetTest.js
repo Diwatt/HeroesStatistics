@@ -1,10 +1,12 @@
 import React from 'react';
+import Enzyme from 'enzyme';
+import Adapter from 'enzyme-adapter-react-16';
 import { expect } from 'chai';
-import { shallow, mount, render } from 'enzyme';
 import Reset from '../../app/js/components/Reset';
 
+Enzyme.configure({ adapter: new Adapter() });
 describe('<Reset />', () => {
-    let wrapper = shallow(<Reset />);
+    let wrapper = Enzyme.shallow(<Reset />);
     it('initial state willDelete null', () => {
         expect(wrapper.state().willDelete).to.be.null;
     });

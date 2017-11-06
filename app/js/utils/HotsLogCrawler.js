@@ -1,6 +1,7 @@
 import Crawler from 'crawler';
 import crypto from 'crypto';
 import 'isomorphic-fetch';
+import iconv from 'iconv-lite';
 import Cache from './Cache';
 import HomeConfigurator from './HotsLogsHomeConfigurator';
 import HistoryConfigurator from './HotsLogsHistoryConfigurator';
@@ -12,6 +13,7 @@ export default class HotsLogCrawler {
     mapsUrl = 'https://api.hotslogs.com/Public/Data/Maps';
 
     constructor(playerId = 1350838) {
+        iconv.skipDecodeWarning = true;
         this.playerId = playerId;
         this.cache = new Cache();
         this.cache.setValidator(data => {
@@ -51,8 +53,6 @@ export default class HotsLogCrawler {
                     }
 
                     let heroes = config.parseTable(response.$);
-                    console.info(heroes);
-
                     if (0 === heroes.length) {
                         reject([]);
                     }
@@ -92,7 +92,7 @@ export default class HotsLogCrawler {
                 }
             };
 
-            this._fetchHtml(url, queueConfig);
+            this._fetchHtml(url, queueConfig, true);
         });
     }
 
@@ -155,7 +155,7 @@ export default class HotsLogCrawler {
                 }
             };
 
-            this._fetchHtml(url, queueConfig, waitUntil);
+            this._fetchHtml(url, queueConfig, false, waitUntil);
         });
     }
 
@@ -163,14 +163,15 @@ export default class HotsLogCrawler {
      *
      * @param {string} url
      * @param {Object} config
+     * @param {Boolean} forceUpdate
      * @param {Number} waitUntil
      * @private
      */
-    async _fetchHtml(url, config, waitUntil = 1000) {
-        if (!this.cache.has(url) && navigator.onLine) {
+    async _fetchHtml(url, config, forceUpdate = false, waitUntil = 1000) {
+        if ((!this.cache.has(url) || forceUpdate) && this._isOnline()) {
             await snooze(waitUntil);
             console.info('fetching '+url+' from web');
-            let response = await fetch(url);
+            let response = await this._fetch(url);
             let html = await response.text();
             this.cache.save(url, html);
 
@@ -201,9 +202,9 @@ export default class HotsLogCrawler {
             } catch (err) {}
         }
 
-        if (navigator.onLine) {
+        if (this._isOnline()) {
             console.info('fetching ' + url + ' from cache');
-            let response = await fetch(url);
+            let response = await this._fetch(url);
             let data = await response.json();
             this.cache.save(url, JSON.stringify(data));
         } else {
@@ -236,5 +237,27 @@ export default class HotsLogCrawler {
      */
     _getCrawler() {
         return new Crawler({rateLimit: 2000, maxConnections : 1})
+    }
+
+    /**
+     * @param {string} url
+     * @param {*} parameters
+     * @param {*} body
+     * @return {Promise}
+     * @private
+     */
+    _fetch(url, parameters = {}, body = {}) {
+        let headers = {'Accept-Language': 'en,en-US;q=0.9,ur;q=0.8,en;q=0.7'};
+        parameters.headers = Object.assign(headers, parameters.headers || {});
+
+        return fetch(url, parameters, body)
+    }
+
+    /**
+     * @return {boolean}
+     * @private
+     */
+    _isOnline() {
+        return global.navigator === undefined || navigator.onLine
     }
 }

@@ -6,18 +6,20 @@ export default class User {
      * @return {Promise}
      */
     static async getActive() {
-        let Collection = await db.users.where('isActive').equals(1);
-        let CollectionCount = await Collection.count();
-        let user = null;
-        if (CollectionCount > 0) {
-            user = await Collection.first();
-        }
+        return await db.transaction('rw', db.users, async () => {
+            let Collection = await db.users.where('isActive').equals(1);
+            let CollectionCount = await Collection.count();
+            let user = null;
+            if (CollectionCount > 0) {
+                user = await Collection.first();
+            }
 
-        return user;
+            return user;
+        });
     }
 
     /**
-     * @return {Array}
+     * @return {Promise}
      */
     getGames() {
         return db.games.where('user.id').equals(this.id);

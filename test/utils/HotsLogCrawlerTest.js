@@ -31,11 +31,8 @@ describe('HotsLogCrawler', function() {
             expect(firstGame.date).to.be.a('date');
             expect(firstGame.heroRole).to.be.a('string');
 
-            console.log(games[games.length-1], games[games.length-1].date.toUTCString());
             expect(games[games.length-1].date.toUTCString()).to.be.equals('Sat, 04 Apr 2015 16:29:03 GMT');
-            console.log(games[games.length-2], games[games.length-2].date.toUTCString());
-            expect(games[games.length-2].toUTCString()).to.be.equals('Sat, 04 Apr 2015 18:06:06 GMT');
-            console.log(<games></games>, games[games.length-3].date.toUTCString());
+            expect(games[games.length-2].date.toUTCString()).to.be.equals('Sat, 04 Apr 2015 18:06:06 GMT');
             expect(games[games.length-3].date.toUTCString()).to.be.equals('Sat, 04 Apr 2015 23:36:45 GMT');
             done();
         }).catch((e) => {
@@ -43,7 +40,7 @@ describe('HotsLogCrawler', function() {
         });
     });
 
-    xit('getGameSummary should return player games', (done) => {
+    it('getGameSummary should return player games', (done) => {
         crawler.getGameSummary(120859507).then((summaries) => {
             expect(summaries).to.be.a('array');
             expect(summaries).to.not.be.empty;
@@ -93,7 +90,7 @@ describe('HotsLogCrawler', function() {
         });
     });
 
-    xit('getHeroes should return heroes', (done) => {
+    it('getHeroes should return heroes', (done) => {
         crawler.getHeroes().then((heroes) => {
             expect(heroes).to.be.a('array');
             expect(heroes).to.not.be.empty;
@@ -104,18 +101,24 @@ describe('HotsLogCrawler', function() {
         });
     });
 
-    xit('getHeroesBasics should return basics stats', (done) => {
+    it('getHeroesBasics should return basics stats', (done) => {
         crawler.getHeroesBasics().then((heroes) => {
             expect(heroes).to.be.a('array');
             expect(heroes).to.not.be.empty;
-            //console.log(heroes[0]);
+            let hero = heroes[0];
+            expect(hero.name).to.be.a('string');
+            expect(hero.playedGames).to.be.a('number');
+            expect(hero.banned).to.be.a('number');
+            expect(hero.pickRate).to.be.a('number');
+            expect(hero.averageWinRate).to.be.a('number');
+            expect(hero.progressRate).to.be.a('number');
             done();
         }).catch((e) => {
             done(e);
         });
     });
 
-    xit('getMaps should return maps', (done) => {
+    it('getMaps should return maps', (done) => {
         crawler.getMaps().then((maps) => {
             expect(maps).to.be.a('array');
             expect(maps).to.not.be.empty;
